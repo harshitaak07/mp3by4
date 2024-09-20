@@ -1,16 +1,17 @@
+import os
 from dotenv import load_dotenv
-load_dotenv()
-
 from flask import Flask, request, jsonify
 from prisma import Prisma
 from text_extract import extract_text_from_url  # Import your extraction function
 
+load_dotenv()
+
 app = Flask(__name__)
 db = Prisma()
 
-@app.before_first_request
-async def init_db():
-    await db.connect()
+def init_db():
+    # Connect to the database when the app starts
+    db.connect()
 
 @app.route('/extract/<int:webpage_id>', methods=['GET'])
 async def extract(webpage_id):
