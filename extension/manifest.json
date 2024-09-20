@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "mp3by4",
   "version": "1.0",
-  "description": "An extension to convert text into explanatory videos or fun songs.",
+  "description": "An extension to convert webpages into fun explanatory videos.",
   "permissions": ["activeTab", "scripting"],
   "background": {
     "service_worker": "background.js"
