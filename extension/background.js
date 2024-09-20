@@ -3,6 +3,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const classification = "concept_learning"; // Define your classification
 
   fetch("http://your-backend-url/extract", {
+    // Replace with your backend URL
     method: "POST",
     headers: {
       "Content-Type": "application/json",
