@@ -9,20 +9,19 @@ def extract_text_from_url(url):
     
     soup = BeautifulSoup(response.content, 'html5lib')
     
-    for script_or_style in soup(['script', 'style', 'noscript', 'header', 'footer', 'aside', 'nav']):#removing styles/css
+    for script_or_style in soup(['script', 'style', 'noscript', 'header', 'footer', 'aside', 'nav']):#removing the styles
         script_or_style.decompose()
 
     text_elements = []
     for tag in soup.find_all(['h1', 'p', 'h2', 'h3', 'h4', 'div', 'h5', 'h6']):
         text = tag.get_text(strip=True)
         if text:
-            text_elements.append(text + '\n') 
+            text_elements.append(text + '\n')
 
     full_text = '\n\n'.join(text_elements)
     
     return full_text
 
-# Example usage
-url = 'https://aws.amazon.com/what-is/quantum-computing/#:~:text=Quantum%20computing%20is%20a%20multidisciplinary,faster%20than%20on%20classical%20computers.'  # Replace with the URL of your choice
+url = 'https://www.geeksforgeeks.org/linked-list-data-structure/'
 extracted_text = extract_text_from_url(url)
 print(extracted_text)
