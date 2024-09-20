@@ -2,7 +2,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const url = tabs[0].url; // Get current tab URL
   const classification = "concept_learning"; // Define your classification
 
-  fetch("http://your-backend-url/extract", {
+  fetch("http://127.0.0.1:5000/extract", {
     // Replace with your backend URL
     method: "POST",
     headers: {
