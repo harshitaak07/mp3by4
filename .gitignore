@@ -1,0 +1,13 @@
+# Virtual environment folders
+bin/
+include/
+lib/
+Scripts/
+*.pyc
+__pycache__/
+
+# Pyvenv config file
+pyvenv.cfg
+
+# Environment variables file
+.env

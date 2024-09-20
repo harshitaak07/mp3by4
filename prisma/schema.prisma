@@ -1,0 +1,69 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-py"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Define your models
+model WebPage {
+  id             Int       @id @default(autoincrement())
+  url            String    @unique
+  text           String
+  title          String
+  classification String    // "concept_learning" or "language_learning"
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  summaries      Summary[]
+}
+
+model Summary {
+  id         Int          @id @default(autoincrement())
+  webPage    WebPage      @relation(fields: [webPageId], references: [id])
+  webPageId  Int
+  summary    String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  funSentences GeneratedFunSentence[]
+}
+
+model GeneratedFunSentence {
+  id         Int       @id @default(autoincrement())
+  summary    Summary   @relation(fields: [summaryId], references: [id])
+  summaryId  Int
+  sentence   String
+  mediaType  String    // "video" or "song"
+  createdAt  DateTime  @default(now())
+  videos     Video[]
+  songs      Song[]
+}
+
+model Video {
+  id                  Int       @id @default(autoincrement())
+  generatedSentence   GeneratedFunSentence @relation(fields: [generatedSentenceId], references: [id])
+  generatedSentenceId Int
+  videoUrl            String
+  audioFileUrl        String
+  clipFileUrl         String
+  createdAt           DateTime  @default(now())
+}
+
+model Song {
+  id                 Int       @id @default(autoincrement())
+  generatedSentence  GeneratedFunSentence @relation(fields: [generatedSentenceId], references: [id])
+  generatedSentenceId Int
+  songFileUrl        String
+  createdAt          DateTime  @default(now())
+}
+
+model AnimeCharacterAudio {
+  id            Int       @id @default(autoincrement())
+  characterName String
+  audioFileUrl  String
+  clipFileUrl   String
+  createdAt     DateTime  @default(now())
+}
