@@ -22,6 +22,6 @@ def extract_text_from_url(url):
     
     return full_text
 
-url = 'https://www.geeksforgeeks.org/linked-list-data-structure/'
+# url = 'https://www.geeksforgeeks.org/linked-list-data-structure/'
 extracted_text = extract_text_from_url(url)
 print(extracted_text)
