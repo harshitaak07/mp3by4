@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 import os
 import shutil  # Added for cleaning up the output folder
+import subprocess
 
 def isolate_person(input_video, output_folder):
     # Initialize MediaPipe
@@ -72,7 +73,7 @@ def stitch_images_to_video(image_folder, output_video, fps):
     height, width = frame.shape[:2]
 
     # Create VideoWriter object
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # You can also try 'avc1' or 'H264'
+    fourcc = cv2.VideoWriter_fourcc(*'H264')  # You can also try 'avc1' or 'H264'
     out = cv2.VideoWriter(output_video, fourcc, fps, (width, height))
 
     for image in images:
@@ -113,6 +114,19 @@ def stitch_images_to_video(image_folder, output_video, fps):
     out.release()
     print(f"Video created: {output_video}")
 
+
+
+def reencode_video(input_video, output_video):
+    command = [
+        'ffmpeg', '-y',  # Overwrite the output file
+        '-i', input_video,  # Input file
+        '-c:v', 'libx264',  # Video codec H264
+        '-crf', '23',  # Quality setting (lower is better, default is 23)
+        '-preset', 'fast',  # Encoding speed vs. compression tradeoff
+        '-pix_fmt', 'yuv420p',  # Ensures compatibility
+        output_video
+    ]
+    subprocess.run(command)
 
 # Example usage
 input_video = "19811797.mp4"

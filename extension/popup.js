@@ -1,4 +1,7 @@
 document.getElementById('extractBtn').addEventListener('click', () => {
+    const loadingElement = document.getElementById('result');
+    loadingElement.innerText = "Processing your video, please wait...";
+
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.scripting.executeScript(
             {
@@ -7,19 +10,19 @@ document.getElementById('extractBtn').addEventListener('click', () => {
             },
             async (result) => {
                 const extractedText = result[0].result.join('\n\n');
-                
+
                 // Call backend server to summarize the text
                 const summaryResponse = await fetch('http://localhost:5000/summarize', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: extractedText })
                 });
-                
+
                 const summaryData = await summaryResponse.json();
                 const summaryText = summaryData.summary;
 
-                // Display the summary in an alert
-                alert(`Summary:\n${summaryText}`);
+                // Display the summary in the popup
+                loadingElement.innerText = `Summary:\n${summaryText}\n\nProcessing video...`;
 
                 // Call backend server to get the processed video URL
                 const videoResponse = await fetch('http://localhost:5000/isolate', {
@@ -29,19 +32,23 @@ document.getElementById('extractBtn').addEventListener('click', () => {
                 });
 
                 const videoData = await videoResponse.json();
-                const videoURL = videoData.videoURL;
+                const videoURL = `http://localhost:5000${videoData.videoURL}`;
 
-                // Add a video element to the webpage with a transparent background
+                // Show video on the active tab in bottom-right corner
                 chrome.scripting.executeScript({
                     target: { tabId: tabs[0].id },
                     func: displayVideoOnPage,
                     args: [videoURL]
                 });
+
+                // Update the popup message to indicate the video has been shown
+                loadingElement.innerText += `\n\nVideo has been displayed on the webpage.`;
             }
         );
     });
 });
 
+// Function to extract text from the active webpage
 function extractText() {
     const elements = document.body.querySelectorAll('h1, p, h2, h3, h4, h5, h6, div');
     let extractedText = [];
@@ -49,20 +56,21 @@ function extractText() {
         extractedText.push(el.innerText.trim());
     });
 
-    // Split the extracted text into chunks based on double new lines
-    const chunks = extractedText.join('\n\n').split(/\n\s*\n/); // Splitting based on one or more new lines
+    const chunks = extractedText.join('\n\n').split(/\n\s*\n/); // Split into chunks
     return chunks;
 }
 
+// Function to display the video on the active webpage at the bottom-right corner
 function displayVideoOnPage(videoURL) {
-    print(videoURL)
     const videoElement = document.createElement('video');
     videoElement.src = videoURL;
     videoElement.style.position = 'fixed';
     videoElement.style.bottom = '10px';
     videoElement.style.right = '10px';
     videoElement.style.width = '300px';
-    videoElement.style.background = 'transparent';
+    videoElement.style.backgroundColor = 'transparent';
+    videoElement.style.zIndex = '10000'; // Ensure the video stays on top
     videoElement.controls = true;
+
     document.body.appendChild(videoElement);
 }
