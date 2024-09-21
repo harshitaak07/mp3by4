@@ -5,12 +5,13 @@ from datetime import datetime
 import pyttsx3
 import pyaudio
 import wave
+from sentence_generate import narrative
 from dotenv import load_dotenv
 
 load_dotenv()
 api_key = os.getenv('GEMINI_KEY')
 
-# Generate lyrics using Gemini API
+# # Generate lyrics using Gemini API
 def generate_lyrics(input_text):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
@@ -20,7 +21,6 @@ def generate_lyrics(input_text):
 
 # Save to MP3 file and play using PyAudio
 def save_to_mp3_and_play(lyrics):
-    # Generate a unique filename using current timestamp
     filename = f"rap_song_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp3"
 
     # Initialize pyttsx3 for TTS
@@ -69,6 +69,8 @@ def save_to_mp3_and_play(lyrics):
 def main():
     input_text = "Hydrogen, Helium, Lithium, Beryllium, Carbon"
     generated_lyrics = generate_lyrics(input_text)
+
+
     
     # Save the song as MP3 and play it
     save_to_mp3_and_play(generated_lyrics)
