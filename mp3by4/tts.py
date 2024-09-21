@@ -9,15 +9,15 @@ from sentence_generate import narrative
 from dotenv import load_dotenv
 
 load_dotenv()
-# api_key = os.getenv('GEMINI_KEY')
+api_key = os.getenv('GEMINI_KEY')
 
 # # Generate lyrics using Gemini API
-# def generate_lyrics(input_text):
-#     genai.configure(api_key=api_key)
-#     model = genai.GenerativeModel("gemini-1.5-flash")
-#     response = model.generate_content("Create a rap verse that incorporates the keywords. The lyrics should have a strong rhythm and flow, using internal rhymes and a consistent rhyme scheme. Make sure all the keywords are used naturally in the lyrics. The keywords are: " + input_text)
-#     print(response.text)
-#     return response.text
+def generate_lyrics(input_text):
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content("Create a rap verse that incorporates the keywords. The lyrics should have a strong rhythm and flow, using internal rhymes and a consistent rhyme scheme. Make sure all the keywords are used naturally in the lyrics. The keywords are: " + input_text)
+    print(response.text)
+    return response.text
 
 # Save to MP3 file and play using PyAudio
 def save_to_mp3_and_play(lyrics):
@@ -67,8 +67,8 @@ def save_to_mp3_and_play(lyrics):
     p.terminate()
 
 def main():
-    # input_text = "Hydrogen, Helium, Lithium, Beryllium, Carbon"
-    # generated_lyrics = generate_lyrics(input_text)
+    input_text = "Hydrogen, Helium, Lithium, Beryllium, Carbon"
+    generated_lyrics = generate_lyrics(input_text)
 
 
     
