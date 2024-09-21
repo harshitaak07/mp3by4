@@ -1,26 +1,25 @@
-from text_extract import extracted_text
+from dotenv import load_dotenv
+import google.generativeai as genai
+import os
 
-import spacy
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lsa import LsaSummarizer  # Latent Semantic Analysis
+# Load the .env file
+load_dotenv()
 
-# Load spaCy's English model
-nlp = spacy.load("en_core_web_sm")
+# Access the API key
+api_key = os.getenv("GEMINI_KEY")
 
-def summarize_text(text, sentence_count=3):
-    # Preprocess the text using spaCy
-    doc = nlp(text)
-    processed_text = ' '.join([sent.text for sent in doc.sents])
+def query(input_text):
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content("Understand and generate a narration to teach the concepts given below. Make the explanation interesting and well structured. It is not necessary to use examples, but please use them if they help explain the topic better. Teach it to high schoolers and older age groups. Emphasise on using lesser metaphors, and generate the dialogue fluently. The concept basis is: "+input_text)
+    print(response.text)
 
-    # Summarize using Sumy
-    parser = PlaintextParser.from_string(processed_text, Tokenizer("english"))
-    summarizer = LsaSummarizer()
-    summary = summarizer(parser.document, sentence_count)
+def main():
+    with open('C:/Users/shamb/Downloads/extracted_text.txt', 'r',encoding='utf-8') as file:  # Ensure this matches where you save the file
+        input_text = file.read()
+    
+    narrative = query(input_text)
+    print(f"Narrative:\n{narrative}")
 
-    return ' '.join([str(sentence) for sentence in summary])
-
-# Example text
-text = extracted_text
-summary = summarize_text(text)
-print("Summary:", summary)
+if __name__=="__main__":
+    main()
