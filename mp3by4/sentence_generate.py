@@ -27,7 +27,7 @@ def query(input_text):
 
 def save_to_mp3_and_play(lyrics):
     
-    filename = f"video_narrative_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp3"
+    filename = f"video_narrative.mp3"
 
     # Initialize pyttsx3 for TTS
     engine = pyttsx3.init()
