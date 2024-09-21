@@ -117,7 +117,7 @@ def stitch_images_to_video(image_folder, output_video, fps):
 # Example usage
 input_video = "19811797.mp4"
 output_folder = "output_frames"
-output_video = "final_output.mp4"
+output_video = "static/final_output.mp4"
 
 # First, isolate the person in each frame and get the original fps
 original_fps = isolate_person(input_video, output_folder)
