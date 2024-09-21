@@ -1,59 +1,81 @@
-import cv2
-import numpy as np
-import pycuda.driver as cuda
-import pycuda.autoinit
+import os
+import googleapiclient.discovery
+import yt_dlp as youtube_dl 
 
-video_path = 'hello.mp4'
-cap = cv2.VideoCapture(video_path)
+API_KEY = 'AIzaSyBE5kLU3xYeklLYytBOJ0ZncvCJUM1tGiA'
 
-if not cap.isOpened():
-    print("Error: Could not open video file")
-    exit()
+def search_youtube(query, max_results=5):
+    youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=API_KEY)
+    
+    request = youtube.search().list(
+        part="snippet",
+        q=query,
+        type="video",
+        maxResults=max_results,
+        order="relevance"
+    )
+    
+    response = request.execute()
+    
+    video_results = []
+    for item in response['items']:
+        video_id = item['id']['videoId']
+        
+        video_request = youtube.videos().list(
+            part="contentDetails",
+            id=video_id
+        )
+        video_response = video_request.execute()
+        
+        duration = video_response['items'][0]['contentDetails']['duration']
+        duration_seconds = parse_duration(duration)
+        
+        if duration_seconds <= 200:  #timelimit if video
+            video_data = {
+                'title': item['snippet']['title'],
+                'url': f"https://www.youtube.com/watch?v={video_id}",
+                'video_id': video_id,
+                'description': item['snippet']['description'],
+                'published_at': item['snippet']['publishedAt'],
+                'duration': duration_seconds
+            }
+            video_results.append(video_data)
+    
+    return video_results
 
-frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-fps = cap.get(cv2.CAP_PROP_FPS)
+def parse_duration(duration):
+    import isodate
+    return int(isodate.parse_duration(duration).total_seconds())
 
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter('output_video.mp4', fourcc, fps, (frame_width, frame_height))
+def download_video(video_url, save_path='.'):
+    ydl_opts = {
+        'outtmpl': f'{save_path}/%(title)s.%(ext)s',
+        'format': 'best',
+    }
+    
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        print(f"Downloading: {video_url}")
+        ydl.download([video_url])
+        print("Download complete.")
 
-if not out.isOpened():
-    print("Error: Could not open output video file for writing.")
-    exit()
+def main():
+    query = input("Enter a search query (e.g., The Office characters): ")
+    results = search_youtube(query, max_results=10)  
+    
+    print(f"Top {len(results)} results for '{query}':\n")
+    
+    for idx, video in enumerate(results):
+        print(f"{idx + 1}. {video['title']} (Duration: {video['duration']} seconds)")
+        print(f"   URL: {video['url']}")
+        print(f"   Published at: {video['published_at']}")
+        print(f"   Description: {video['description']}\n")
+    
+    if results:
+        download_choice = input("Do you want to download the first video? (yes/no): ").strip().lower()
+        if download_choice == 'yes':
+            video_url = results[0]['url']
+            save_path = '.'
+            download_video(video_url, save_path)
 
-def process_frame(frame):
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    _, mask = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
-    
-    white_background = np.full_like(frame, 255)  
-    
-    mask_inv = cv2.bitwise_not(mask)
-    
-    foreground = cv2.bitwise_and(frame, frame, mask=mask)
-    
-    background = cv2.bitwise_and(white_background, white_background, mask=mask_inv)
-    
-    result = cv2.add(foreground, background)
-    
-    return result
-
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        print("Finished processing all frames or error reading the video.")
-        break
-    
-    print(f"Processing frame of size {frame.shape}")
-    
-    processed_frame = process_frame(frame)
-    
-    cv2.imshow('Processed Frame', processed_frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-    
-    out.write(processed_frame)
-
-cap.release()
-out.release()
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()
