@@ -69,8 +69,30 @@ function displayVideoOnPage(videoURL) {
     videoElement.style.right = '10px';
     videoElement.style.width = '300px';
     videoElement.style.backgroundColor = 'transparent';
-    videoElement.style.zIndex = '10000'; // Ensure the video stays on top
+    videoElement.style.zIndex = '10000';
     videoElement.controls = true;
 
     document.body.appendChild(videoElement);
+
+    // Make video element draggable
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    videoElement.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - videoElement.getBoundingClientRect().left;
+        offsetY = e.clientY - videoElement.getBoundingClientRect().top;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            videoElement.style.left = `${e.clientX - offsetX}px`;
+            videoElement.style.top = `${e.clientY - offsetY}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
 }
+
