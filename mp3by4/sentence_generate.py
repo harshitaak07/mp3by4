@@ -20,6 +20,7 @@ def main():
     
     narrative = query(input_text)
     print(f"Narrative:\n{narrative}")
+    
 
 if __name__=="__main__":
     main()
