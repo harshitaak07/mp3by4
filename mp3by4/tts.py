@@ -1,79 +1,47 @@
-import random
-import google.generativeai as genai
-import os
-from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
 import pyttsx3
-import pyaudio
-import wave
-from sentence_generate import narrative
-from dotenv import load_dotenv
 
-load_dotenv()
-api_key = os.getenv('GEMINI_KEY')
+def extract_text_from_webpage(url):
+    """Extract text from the given webpage URL."""
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Check for HTTP errors
 
-# # Generate lyrics using Gemini API
-def generate_lyrics(input_text):
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content("Create a rap verse that incorporates the keywords. The lyrics should have a strong rhythm and flow, using internal rhymes and a consistent rhyme scheme. Make sure all the keywords are used naturally in the lyrics. The keywords are: " + input_text)
-    print(response.text)
-    return response.text
+        # Parse the HTML content
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-# Save to MP3 file and play using PyAudio
-def save_to_mp3_and_play(lyrics):
-    filename = f"rap_song_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp3"
+        # Extract text from paragraphs or other relevant tags
+        text = ' '.join(p.get_text() for p in soup.find_all('p'))  # Extracts text from all <p> tags
+        return text.strip()
+    except Exception as e:
+        print(f"Error extracting text: {e}")
+        return None
 
-    # Initialize pyttsx3 for TTS
+def convert_text_to_speech(text, output_audio_file):
+    """Convert the provided text to speech and save it as an audio file."""
     engine = pyttsx3.init()
-
-    # Set properties for voice
-    voices = engine.getProperty('voices')
-    for index, voice in enumerate(voices):
-        print(f"Voice {index}: {voice.name} - {voice.id}")
-
-    # Select a male voice (you might need to adjust the index)
-    male_voice_index = 0  # Adjust this based on the printed list
-    engine.setProperty('voice', voices[male_voice_index].id)
-
-    # Set speech rate (increase for faster speech)
-    engine.setProperty('rate', 150)  # Adjust to your preference
-
-    # Save the generated lyrics to an MP3 file
-    engine.save_to_file(lyrics, filename)
+    engine.save_to_file(text, output_audio_file)
     engine.runAndWait()
 
-    print(f"Saved song as {filename}")
-
-    # Play the MP3 file using PyAudio
-    chunk = 1024  # Chunk size for audio stream
-    wf = wave.open(filename, 'rb')  # PyAudio expects WAV; convert if needed
-    p = pyaudio.PyAudio()
-
-    # Open audio stream
-    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
-                    channels=wf.getnchannels(),
-                    rate=wf.getframerate(),
-                    output=True)
-
-    # Read data in chunks and play
-    data = wf.readframes(chunk)
-    while data:
-        stream.write(data)
-        data = wf.readframes(chunk)
-
-    # Stop and close the stream
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
-
-def main():
-    input_text = "Hydrogen, Helium, Lithium, Beryllium, Carbon"
-    generated_lyrics = generate_lyrics(input_text)
-
-
+def main(url, output_audio_file):
+    """Main function to extract text from a webpage and convert it to speech."""
+    # Extract text from the webpage
+    extracted_text = extract_text_from_webpage(url)
     
-    # Save the song as MP3 and play it
-    save_to_mp3_and_play(generated_lyrics)
+    if extracted_text:
+        print("Extracted Text:")
+        print(extracted_text)
+        
+        # Convert the extracted text to speech
+        convert_text_to_speech(extracted_text, output_audio_file)
+        print(f"TTS audio saved to: {output_audio_file}")
+    else:
+        print("No text extracted.")
 
 if __name__ == "__main__":
-    main()
+    url = "https://example.com"  # Replace with your target webpage URL
+    output_audio_file = "output_audio.mp3"
+    output_audio_file = "C://Downloads/output_audio.mp3"
+
+    main(url, output_audio_file)
