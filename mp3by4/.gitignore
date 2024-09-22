@@ -11,3 +11,6 @@ pyvenv.cfg
 
 # Environment variables file
 .env
+
+.mp3
+.mp4
