@@ -3,7 +3,8 @@ import mediapipe as mp
 import numpy as np
 import os
 import shutil  # Added for cleaning up the output folder
-import subprocess
+import subprocess   
+
 
 def isolate_person(input_video, output_folder):
     # Initialize MediaPipe
@@ -13,10 +14,11 @@ def isolate_person(input_video, output_folder):
     if os.path.exists(output_folder):
         shutil.rmtree(output_folder)
     os.makedirs(output_folder, exist_ok=True)
-
-    # Open the input video
+    print(f"Opening video file: {input_video}")
     cap = cv2.VideoCapture(input_video)
-    
+    if not cap.isOpened():
+        print(f"Error: Could not open video file {input_video}")
+        return 0    
     # Get video properties
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -62,6 +64,7 @@ def isolate_person(input_video, output_folder):
 
 def stitch_images_to_video(image_folder, output_video, fps):
     images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
+    print(f"Found {len(images)} images in {image_folder}")
     images.sort()  # Ensure images are in the correct order
 
     if not images:
@@ -116,10 +119,10 @@ def stitch_images_to_video(image_folder, output_video, fps):
 
 
 
-def reencode_video(input_video, output_video):
+def reencode_video(input_video, audio_file, output_video):
     command = [
         'ffmpeg', '-y',  # Overwrite the output file
-        '-i', input_video,  # Input file
+        '-i', input_video,
         '-c:v', 'libx264',  # Video codec H264
         '-crf', '23',  # Quality setting (lower is better, default is 23)
         '-preset', 'fast',  # Encoding speed vs. compression tradeoff
@@ -128,15 +131,14 @@ def reencode_video(input_video, output_video):
     ]
     subprocess.run(command)
 
-# Example usage
-input_video = "19811797.mp4"
-output_folder = "output_frames"
-output_video = "static/final_output.mp4"
-
-# First, isolate the person in each frame and get the original fps
-original_fps = isolate_person(input_video, output_folder)
-
-# Then, stitch the frames into a video using the original fps
-stitch_images_to_video(output_folder, output_video, original_fps)
-
-print(f"Original video FPS: {original_fps}")
+def combine_audio_video(video_file, audio_file, output_file):
+    command = [
+        'ffmpeg', '-y',  # Overwrite the output file
+        '-i', video_file,  # Input video file
+        '-i', audio_file,  # Input audio file
+        '-c:v', 'copy',  # Copy video codec
+        '-c:a', 'aac',  # Set audio codec
+        '-strict', 'experimental',  # Allow experimental codecs
+        output_file  # Output file
+    ]
+    subprocess.run(command)
