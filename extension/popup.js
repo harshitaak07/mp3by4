@@ -12,7 +12,6 @@ document.getElementById("extractBtn").addEventListener("click", () => {
           function: extractText, // Not needed, but kept for other parts
         },
         async (result) => {
-          // Call backend server to generate narration based on webpage URL
           const narrationResponse = await fetch(
             "http://localhost:5000/generate_narration",
             {
@@ -30,7 +29,6 @@ document.getElementById("extractBtn").addEventListener("click", () => {
             console.log("Narrative Text:", narrativeText); // Log the narrative text
             console.log("MP3 URL:", mp3URL); // Log the MP3 URL
   
-            // Display the generated narration in the popup
             loadingElement.innerText += `\n\nNarrative:\n${narrativeText}\n\nNarration audio is ready`;
   
             // Display the MP3 audio player for the narration
@@ -46,7 +44,6 @@ document.getElementById("extractBtn").addEventListener("click", () => {
             );
           }
   
-          // Continue processing the video (assuming this part is still needed)
           const videoResponse = await fetch("http://localhost:5000/process_and_combine", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -85,7 +82,6 @@ document.getElementById("extractBtn").addEventListener("click", () => {
     return chunks;
   }
   
-  // Function to display the video on the active webpage at the bottom-right corner
   function displayVideoOnPage(videoURL) {
     const videoElement = document.createElement("video");
     videoElement.src = videoURL;
@@ -119,4 +115,5 @@ document.getElementById("extractBtn").addEventListener("click", () => {
     document.addEventListener("mouseup", () => {
       isDragging = false;
     });
+
   }
