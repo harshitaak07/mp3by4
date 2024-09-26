@@ -39,7 +39,7 @@ document.getElementById("extractBtn").addEventListener("click", () => {
             audioElement.src = mp3URL;
             loadingElement.appendChild(audioElement);
           } else {
-            loadingElement.innerText += "\nFailed to generate narration.";
+            loadingElement.innerText += "\nNarration Generating";
             console.error(
               "Failed to generate narration:",
               await narrationResponse.json()
