@@ -24,28 +24,6 @@ def summarize():
     else:
         return jsonify({"error": "No text provided"}), 400
 
-# @app.route('/isolate', methods=['POST'])
-# def isolate_video():
-#     # Assuming video file path is sent in the request body
-#     data = request.get_json()
-#     input_video = data.get('videoPath')
-    
-#     if not input_video:
-#         return jsonify({"error": "No video path provided"}), 400
-    
-#     output_folder = "output_frames"
-#     output_video = "final_output.mp4"  # Filename to save the isolated video
-
-#     # Process the video to isolate the person and stitch the frames back into a video
-#     try:
-#         original_fps = isolate_person(input_video, output_folder)
-#         stitch_images_to_video(output_folder, os.path.join(app.static_folder, output_video), original_fps)
-
-#         # Return the URL of the processed video
-#         return jsonify({"videoURL": f"/static/{output_video}"}), 200
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
 @app.route('/generate_narration', methods=['POST'])
 def generate_narration():
     data = request.get_json()
@@ -53,12 +31,10 @@ def generate_narration():
 
     if url:
         try:
-            # Extract text from the provided URL
             extracted_text = extract_text_from_webpage(url)
             if not extracted_text:
                 return jsonify({"error": "Failed to extract text."}), 500
 
-            # Convert the extracted text to speech and save to MP3
             mp3_filename = "output_audio.mp3"  # Define output file name
             saved_mp3 = convert_text_to_speech(extracted_text, mp3_filename)
 
@@ -76,45 +52,8 @@ def generate_narration():
 def serve_file(filename):
     return send_from_directory(app.static_folder, filename, conditional=True)
 
-# @app.route('/overlay_audio', methods=['POST'])
-# def overlay_audio():
-#     data = request.get_json()
-#     video_file = data.get('video_path')
-#     audio_file = data.get('audio_path')
-    
-#     if not video_file or not audio_file:
-#         return jsonify({"error": "Video path and audio path are required"}), 400
-    
-#     output_file = "final_video.mp4"
-#     output_path = os.path.join(app.static_folder, output_file)
-    
-#     try:
-#         overlay_audio_on_video(video_file, audio_file, output_path)
-#         return jsonify({"video_url": f"/static/{output_file}"}), 200
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-# @app.route('/combine_video_audio', methods=['POST'])
-# def combine_video_audio():
-#     data = request.get_json()
-#     video_path = data.get('video_path')
-#     audio_path = data.get('audio_path')
-    
-#     if not video_path or not audio_path:
-#         return jsonify({"error": "Video path and audio path are required"}), 400
-    
-#     output_file = "final_output_video_merged.mp4"
-#     output_path = os.path.join(app.static_folder, output_file)
-    
-#     try:
-#         combine_audio_video(video_path, audio_path, output_path)
-#         return jsonify({"video_url": f"/static/{output_file}"}), 200
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
 @app.route('/process_and_combine', methods=['POST'])
 async def process_and_combine():
-    # Parse the request to get video and audio paths
     data = request.get_json()
 
     # Log the data to debug
@@ -146,8 +85,6 @@ async def process_and_combine():
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
         return jsonify({"error": str(e)}), 500
-
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0",port=5000)

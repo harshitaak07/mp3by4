@@ -1,17 +1,6 @@
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 
 def combine_audio_video(video_path, audio_path, output_path):
-    """
-    Combines audio and video, looping the video if audio is longer.
-    
-    Args:
-    video_path (str): Path to the input video file
-    audio_path (str): Path to the input audio file
-    output_path (str): Path where the output video will be saved
-    
-    Returns:
-    None
-    """
     try:
         # Load the video and audio clips
         video = VideoFileClip(video_path)
@@ -38,7 +27,6 @@ def combine_audio_video(video_path, audio_path, output_path):
         print(f"An error occurred: {str(e)}")
 
     finally:
-        # Close the clips to free up system resources
         if 'video' in locals():
             video.close()
         if 'audio' in locals():
@@ -46,4 +34,3 @@ def combine_audio_video(video_path, audio_path, output_path):
         if 'final_clip' in locals():
             final_clip.close()
 
-# Example usage:

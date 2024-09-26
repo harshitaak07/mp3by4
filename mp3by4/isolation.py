@@ -2,7 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import os
-import shutil  # Added for cleaning up the output folder
+import shutil  
 import subprocess   
 
 
@@ -103,13 +103,9 @@ def stitch_images_to_video(image_folder, output_video, fps):
             foreground = cv2.resize(foreground, (width, height))
             alpha = cv2.resize(alpha, (width, height))
 
-            # Blend the image with the white background using the alpha channel
             blended = foreground * alpha + white_bg * (1 - alpha)
-
-            # Convert back to uint8 for writing to video
             frame_bgr = blended.astype(np.uint8)
         else:
-            # No alpha channel, use the frame as is
             frame_bgr = frame
 
         out.write(frame_bgr)
