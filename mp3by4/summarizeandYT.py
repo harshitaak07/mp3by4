@@ -82,7 +82,6 @@ def calculate_video_length_based_on_summary(summary_text):
     
     return len(summary_text) * 2
 
-# Main Process
 if __name__ == '__main__':
     with open('C:/Users/eshit/Downloads/extracted_text.txt', 'r', encoding='utf-8') as file:
         extracted_text = file.read()

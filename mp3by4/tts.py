@@ -6,13 +6,13 @@ def extract_text_from_webpage(url):
     """Extract text from the given webpage URL."""
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Check for HTTP errors
+        response.raise_for_status()  
 
         # Parse the HTML content
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # Extract text from paragraphs or other relevant tags
-        text = ' '.join(p.get_text() for p in soup.find_all('p'))  # Extracts text from all <p> tags
+        text = ' '.join(p.get_text() for p in soup.find_all('p')) 
         return text.strip()
     except Exception as e:
         print(f"Error extracting text: {e}")
@@ -40,7 +40,7 @@ def main(url, output_audio_file):
         print("No text extracted.")
 
 if __name__ == "__main__":
-    url = "https://example.com"  # Replace with your target webpage URL
+    url = "https://example.com" 
     output_audio_file = "output_audio.mp3"
     output_audio_file = "C://Downloads/output_audio.mp3"
 

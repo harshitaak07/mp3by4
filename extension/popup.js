@@ -9,7 +9,7 @@ document.getElementById("extractBtn").addEventListener("click", () => {
       chrome.scripting.executeScript(
         {
           target: { tabId: tabs[0].id },
-          function: extractText, // Not needed, but kept for other parts
+          function: extractText, 
         },
         async (result) => {
           const narrationResponse = await fetch(
@@ -17,7 +17,7 @@ document.getElementById("extractBtn").addEventListener("click", () => {
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ url: activeTabUrl }), // Pass the active tab URL
+              body: JSON.stringify({ url: activeTabUrl }), 
             }
           );
   

@@ -10,7 +10,6 @@ from combiner import combine_audio_video
 app = Flask(__name__)
 CORS(app)
 
-# Set the static folder
 app.static_folder = 'static'
 
 @app.route('/summarize', methods=['POST'])
@@ -27,7 +26,7 @@ def summarize():
 @app.route('/generate_narration', methods=['POST'])
 def generate_narration():
     data = request.get_json()
-    url = data.get('url')  # Get the URL from the request
+    url = data.get('url')  
 
     if url:
         try:
